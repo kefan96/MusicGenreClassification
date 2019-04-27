@@ -13,6 +13,7 @@ import pickle
 import sys
 import os
 from numpy import array
+from sklearn.decomposition import PCA
 
 def die_with_usage():
     """ HELP MENU """
@@ -77,7 +78,7 @@ if __name__ == "__main__":
                 i += 1
 
     #save data and lables
-    with open("data", 'w') as f:
+    with open("feature", 'w') as f:
         f.write(pickle.dumps(data.values()))
 
     with open("labels", 'w') as f:
@@ -92,3 +93,20 @@ if __name__ == "__main__":
     x_data = np.asarray(reshapedList).astype('float64')
     x_data = x_data.reshape((x_data.shape[0], -1))
     print(x_data)
+
+    # apply pca
+    pca = PCA(n_components=2)
+    newX = pca.fit_transform(x_data)
+    print(newX)
+
+    vis_x = newX[:, 0]
+    vis_y = newX[:, 1]
+    colors = []
+    for label in labels:
+        colors.append(label.index(1))
+
+    plt.scatter(vis_x, vis_y, c=colors, cmap=plt.cm.get_cmap("jet", 10))
+    plt.colorbar(ticks=range(10), label='Genres')
+    plt.clim(-0.5, 9.5)
+    plt.title('pca mfcc samples as genres')
+    plt.show()
